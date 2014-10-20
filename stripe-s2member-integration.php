@@ -4,7 +4,7 @@ Plugin Name: s2Member Stripe Integration
 Author: Furlong Design
 Author URI: http://furlongdesign.com
 Version: 1.0
-Description: Create users in s2member with stripe buttons
+Description: s2Member Stripe Integration plugin connects your s2Member to Stripe and lets you charge for your memberships. Now you can add Stripe as a payment gateway to s2Member.
 */
 //Media Button to Editor
 add_action('media_buttons', 'stripe_editor_button', 11);
