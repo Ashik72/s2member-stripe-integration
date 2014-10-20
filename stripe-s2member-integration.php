@@ -14,7 +14,7 @@ function stripe_editor_button()
     $title = 'Add s2Member Stripe Product';
     //append the icon
     $context .= "<a title='{$title}' href='#TB_inline?width=400&inlineId=stripe_container'
-    class='thickbox button'>Add Stripe Buttons</a>";
+    class='thickbox button'>Add s2Member Stripe Product</a>";
     echo $context;
 }
 
