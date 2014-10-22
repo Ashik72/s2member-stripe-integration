@@ -500,7 +500,7 @@ add_action('wp_footer', 'stripe_script');
 function stripe_script()
 {
     ?>
-    <script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+    <script type="text/javascript" src="<?php echo plugins_url('js-stripe.min.js', __FILE__);?>"></script>
     <script>
         Stripe.setPublishableKey('<?php echo get_option('stripepkey');?>');
         var handler = StripeCheckout.configure({
