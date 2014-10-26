@@ -102,8 +102,8 @@ add_action('admin_menu', 'stripe_install');
 function stripe_install()
 {
     $menu = add_menu_page(
-        's2Member Stripe',
-        's2Member Stripe',
+        's2Member Stripe Integration',
+        's2Member Stripe Integration',
         'manage_options',
         'cwd_stripe',
         'cwd_stripe_checkout',
@@ -195,200 +195,202 @@ function cwd_stripe_checkout()
         .stripe-row {
             border-bottom: 1px solid #E1E1E1;
         }
-
     </style>
+    
+    <div class="wrap">
+        <h2>s2Member Stripe Integration</h2>
 
+        <div class='stripe-step'>
 
-    <div class='stripe-step'>
+            <h3>Step 1: Enter Stripe Api credentials <span class="has-tip"
+                                                           title="<ul style='list-style:disc;'><li style='margin-left:10px;'>Visit http://stripe.com.</li><li style='margin-left:10px;'>Click on 'Your account' link.</li><li style='margin-left:10px;'>Navigate to Api Keys</li><li style='margin-left:10px;'>Use the test or Live keys.</li><li style='margin-left:10px;'>To test with test keys use the card no 4242 4242 4242 4242 with a future date.</li></ul>"><img
+                        src="<?php echo plugins_url('help.png', __FILE__); ?>" alt=""/></span></h3>
 
-        <h3>Step 1: Enter Stripe Api credentials <span class="has-tip"
-                                                       title="<ul style='list-style:disc;'><li style='margin-left:10px;'>Visit http://stripe.com.</li><li style='margin-left:10px;'>Click on 'Your account' link.</li><li style='margin-left:10px;'>Navigate to Api Keys</li><li style='margin-left:10px;'>Use the test or Live keys.</li><li style='margin-left:10px;'>To test with test keys use the card no 4242 4242 4242 4242 with a future date.</li></ul>"><img
-                    src="<?php echo plugins_url('help.png', __FILE__); ?>" alt=""/></span></h3>
+            <form action="" method="POST">
+                <table class="form-table">
+                    <tbody>
+                    <tr valign="top">
+                        <td scope="row">Publishable Key:</td>
+                        <td><input type="text" name="pkey" value="<?php echo get_option('stripepkey'); ?>" size="35">
+                        </td>
+                    </tr>
+                    <tr valign="top">
+                        <td scope="row">Secret Key:</td>
+                        <td><input type="text" name="skey" value="<?php echo get_option('stripeskey'); ?>" size="35">
+                        </td>
+                    </tr>
+                    <tr valign="top">
+                        <th></th>
+                        <td><input type="submit" name="setstripe" value="Save" class="button-primary" id="set_stripe"/>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </form>
+        </div>
 
-        <form action="" method="POST">
-            <table class="form-table">
-                <tbody>
-                <tr valign="top">
-                    <td scope="row">Publishable Key:</td>
-                    <td><input type="text" name="pkey" value="<?php echo get_option('stripepkey'); ?>" size="35"></td>
-                </tr>
-                <tr valign="top">
-                    <td scope="row">Secret Key:</td>
-                    <td><input type="text" name="skey" value="<?php echo get_option('stripeskey'); ?>" size="35">
-                    </td>
-                </tr>
-                <tr valign="top">
-                    <th></th>
-                    <td><input type="submit" name="setstripe" value="Save" class="button-primary" id="set_stripe"/></td>
-                </tr>
-
-
-                </tbody>
-            </table>
-
-        </form>
-    </div>
-
-    <?php if ($plandata) { ?>
-    <div class='stripe-step'>
-        <h3>Step 2: Connect to Stripe</h3>
-        <table class="form-table">
-            <tbody>
-            <tr valign="top">
-                <td colspan='2'>
-                    <?php
-                    try {
-                        require_once('stripe/lib/Stripe.php');
-                        Stripe2 :: setApiKey(get_option('stripeskey'));
-                        $for_plan = Stripe_Plan2 :: all();
-                        $check    = json_decode($for_plan, true);
-                        if (!$check) {
-                            throw new Exception();
-                        } else {
-                            ?>
-                            <div class='success'><a class="button-primary"
-                                                    href="?page=cwd_stripe&action=disconnect_from_stripe">Disconnect
-                                    From Stripe</a></div>
-                            <div class='success'><img src="<?php echo plugins_url('check.png', __FILE__) ?>" alt=""/>
-                                You are connected to the Stripe API.
-                            </div>
-
-                        <?php
-                        }
-                    } catch (Exception $e) {
-                        delete_option('stripepkey');
-                        delete_option('stripeskey');
-                        echo "<div class='error'><p>Please enter valid stripe secret key and publishable key</p></div>";
-                    }
-
-                    ?>
-
-                </td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-
-
-
-    <div class='stripe-step'>
-        <h3>Step 3: Link Plans/Product to Roles</h3>
-
-        <form action="" method='post'>
-            <table class="form-table widefat" style='width:850px;'>
-                <tr class='stripe-row'>
-                    <td valign='top'><b>Roles</b></td>
-                    <td><b>Plans</b></td>
-                    <td><b>Products</b></td>
-                </tr>
-                <?php
-                $account_data = json_decode($account, true);
-                if ($account_data['default_currency'] == 'gbp') {
-                    $currency = '&pound;';
-                }
-                if ($account_data['default_currency'] == 'usd') {
-                    $currency = '$';
-                }
-                if ($account_data['default_currency'] == 'eur') {
-                    $currency = '&euro;';
-                }
-                $roles = get_editable_roles();
-                foreach ($roles as $k => $role) {
-                    if (strpos(strtolower($k), 's2member') !== false) {
-                        $type = get_option('stripe_role_type_' . $k);
-                        echo "<tr class='stripe-row'><td>" . $role['name'] . "</td><td>";
-                        if ($type == 1) {
-                            echo "<div class='stripe" . $type . "'><input type='radio' name='stripe_role_check_" . $k
-                                . "' value='1' checked='checked' />";
-                        } else {
-                            echo "<div><input type='radio' name='stripe_role_check_" . $k . "' value='1' />";
-                        }
-
-                        echo "<select name='stripe_role_" . $k . "'><option value=''>Select Plan</option>";
-                        foreach ($plandata['data'] as $value) {
-                            if (get_option('stripe_role_' . $k) == $value['id']) {
-                                echo '<option value="' . $value['id'] . '" selected="selected">' . $value['name']
-                                    . '</option>';
-                            } else {
-                                echo '<option value="' . $value['id'] . '">' . $value['name'] . '</option>';
-                            }
-                            $i++;
-                        }
-                        echo "</select></div></td><td>";
-
-                        if ($type == 2) {
-                            echo "<div class='stripe" . $type
-                                . "'><input type='radio' checked='checked' name='stripe_role_check_" . $k
-                                . "' value='2'/>";
-                        } else {
-                            echo "<div><input type='radio' name='stripe_role_check_" . $k . "' value='2'/>";
-                        }
-                        if (strlen(get_option('stripe_role_amount_' . $k)) > 0) {
-                            echo "<input type='text' name='stripe_role_title_" . $k
-                                . "' placeholder='Product Name' value='" . get_option('stripe_role_title_' . $k)
-                                . "'/>&nbsp;&nbsp;<span class='currency' style='display:inline'>" . $currency
-                                . "</span><input type='text' class='stripe_product_amount' name='stripe_role_amount_"
-                                . $k . "' size='4' placeholder='" . $currency . "' value='" . get_option(
-                                    'stripe_role_amount_' . $k
-                                ) . "'/> ";
-                        } else {
-                            echo "<input type='text' name='stripe_role_title_" . $k
-                                . "' placeholder='Product Name' value='" . get_option('stripe_role_title_' . $k)
-                                . "'/>&nbsp;&nbsp;<span class='currency' >" . $currency
-                                . "</span><input type='text' class='stripe_product_amount' name='stripe_role_amount_"
-                                . $k . "' size='4' placeholder='" . $currency . "' value='" . get_option(
-                                    'stripe_role_amount_' . $k
-                                ) . "'/> ";
-                        }
-
-                        echo "</div></td></tr>";
-                    }
-                }
-                //
-                ?>
-                <tr valign='top' class='stripe-row'>
-                    <th></th>
-                    <td><input type='submit' class="button button-primary" name='update_stripe_role' value='Save'/></td>
-                </tr>
-            </table>
-        </form>
-    </div>
-
-    <div class='stripe-step'>
-        <h3>Step 4: Confirmation Page</h3>
-
-        <form action="" method='post'>
-            <table class="form-table widefat" style='width:850px;'>
-                <tr class='stripe-row'>
-                    <td valign='top' colspan='2'>
-                        <label>Select Page</label>
-                        <select name="thankyou_page">
-                            <option value="">Select Page</option>
+        <?php if ($plandata) { ?>
+            <div class='stripe-step'>
+                <h3>Step 2: Connect to Stripe</h3>
+                <table class="form-table">
+                    <tbody>
+                    <tr valign="top">
+                        <td colspan='2'>
                             <?php
-                            $pages = get_posts('post_type=page&numberposts=-1');
-                            foreach ($pages as $page) {
-                                if ($page->ID == get_option('stripe_thankyou_page')) {
-                                    echo "<option value='" . $page->ID . "' selected='selected'>" . $page->post_title
-                                        . "</option>";
+                            try {
+                                require_once('stripe/lib/Stripe.php');
+                                Stripe2 :: setApiKey(get_option('stripeskey'));
+                                $for_plan = Stripe_Plan2 :: all();
+                                $check    = json_decode($for_plan, true);
+                                if (!$check) {
+                                    throw new Exception();
                                 } else {
-                                    echo "<option value='" . $page->ID . "'>" . $page->post_title . "</option>";
-                                }
-                            }
-                            //
-                            ?>
-                        </select>
-                </tr>
-                <tr valign='top' class='stripe-row'>
-                    <th></th>
-                    <td><input type='submit' class="button button-primary" name='thankyou_page_submit' value='Save'/>
-                    </td>
-                </tr>
-            </table>
-        </form>
-    </div>
+                                    ?>
+                                    <div class='success'><a class="button-primary"
+                                                            href="?page=cwd_stripe&action=disconnect_from_stripe">Disconnect
+                                            From Stripe</a></div>
+                                    <div class='success'><img src="<?php echo plugins_url('check.png', __FILE__) ?>"
+                                                              alt=""/>
+                                        You are connected to the Stripe API.
+                                    </div>
 
+                                <?php
+                                }
+                            } catch (Exception $e) {
+                                delete_option('stripepkey');
+                                delete_option('stripeskey');
+                                echo "<div class='error'><p>Please enter valid stripe secret key and publishable key</p></div>";
+                            }
+
+                            ?>
+
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class='stripe-step'>
+                <h3>Step 3: Link Plans/Product to Roles</h3>
+
+                <form action="" method='post'>
+                    <table class="form-table widefat" style='width:850px;'>
+                        <tr class='stripe-row'>
+                            <td valign='top'><b>Roles</b></td>
+                            <td><b>Plans</b></td>
+                            <td><b>Products</b></td>
+                        </tr>
+                        <?php
+                        $account_data = json_decode($account, true);
+                        if ($account_data['default_currency'] == 'gbp') {
+                            $currency = '&pound;';
+                        }
+                        if ($account_data['default_currency'] == 'usd') {
+                            $currency = '$';
+                        }
+                        if ($account_data['default_currency'] == 'eur') {
+                            $currency = '&euro;';
+                        }
+                        $roles = get_editable_roles();
+                        foreach ($roles as $k => $role) {
+                            if (strpos(strtolower($k), 's2member') !== false) {
+                                $type = get_option('stripe_role_type_' . $k);
+                                echo "<tr class='stripe-row'><td>" . $role['name'] . "</td><td>";
+                                if ($type == 1) {
+                                    echo "<div class='stripe" . $type . "'><input type='radio' name='stripe_role_check_"
+                                        . $k . "' value='1' checked='checked' />";
+                                } else {
+                                    echo "<div><input type='radio' name='stripe_role_check_" . $k . "' value='1' />";
+                                }
+
+                                echo "<select name='stripe_role_" . $k . "'><option value=''>Select Plan</option>";
+                                foreach ($plandata['data'] as $value) {
+                                    if (get_option('stripe_role_' . $k) == $value['id']) {
+                                        echo
+                                            '<option value="' . $value['id'] . '" selected="selected">' . $value['name']
+                                            . '</option>';
+                                    } else {
+                                        echo '<option value="' . $value['id'] . '">' . $value['name'] . '</option>';
+                                    }
+                                    $i++;
+                                }
+                                echo "</select></div></td><td>";
+
+                                if ($type == 2) {
+                                    echo "<div class='stripe" . $type
+                                        . "'><input type='radio' checked='checked' name='stripe_role_check_" . $k
+                                        . "' value='2'/>";
+                                } else {
+                                    echo "<div><input type='radio' name='stripe_role_check_" . $k . "' value='2'/>";
+                                }
+                                if (strlen(get_option('stripe_role_amount_' . $k)) > 0) {
+                                    echo "<input type='text' name='stripe_role_title_" . $k
+                                        . "' placeholder='Product Name' value='" . get_option('stripe_role_title_' . $k)
+                                        . "'/>&nbsp;&nbsp;<span class='currency' style='display:inline'>" . $currency
+                                        . "</span><input type='text' class='stripe_product_amount' name='stripe_role_amount_"
+                                        . $k . "' size='4' placeholder='" . $currency . "' value='" . get_option(
+                                            'stripe_role_amount_' . $k
+                                        ) . "'/> ";
+                                } else {
+                                    echo "<input type='text' name='stripe_role_title_" . $k
+                                        . "' placeholder='Product Name' value='" . get_option('stripe_role_title_' . $k)
+                                        . "'/>&nbsp;&nbsp;<span class='currency' >" . $currency
+                                        . "</span><input type='text' class='stripe_product_amount' name='stripe_role_amount_"
+                                        . $k . "' size='4' placeholder='" . $currency . "' value='" . get_option(
+                                            'stripe_role_amount_' . $k
+                                        ) . "'/> ";
+                                }
+
+                                echo "</div></td></tr>";
+                            }
+                        }
+                        //
+                        ?>
+                        <tr valign='top' class='stripe-row'>
+                            <th></th>
+                            <td><input type='submit' class="button button-primary" name='update_stripe_role'
+                                       value='Save'/></td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+
+            <div class='stripe-step'>
+                <h3>Step 4: Confirmation Page</h3>
+
+                <form action="" method='post'>
+                    <table class="form-table widefat" style='width:850px;'>
+                        <tr class='stripe-row'>
+                            <td valign='top' colspan='2'>
+                                <label>Select Page</label>
+                                <select name="thankyou_page">
+                                    <option value="">Select Page</option>
+                                    <?php
+                                    $pages = get_posts('post_type=page&numberposts=-1');
+                                    foreach ($pages as $page) {
+                                        if ($page->ID == get_option('stripe_thankyou_page')) {
+                                            echo "<option value='" . $page->ID . "' selected='selected'>"
+                                                . $page->post_title . "</option>";
+                                        } else {
+                                            echo "<option value='" . $page->ID . "'>" . $page->post_title . "</option>";
+                                        }
+                                    }
+                                    //
+                                    ?>
+                                </select>
+                        </tr>
+                        <tr valign='top' class='stripe-row'>
+                            <th></th>
+                            <td><input type='submit' class="button button-primary" name='thankyou_page_submit'
+                                       value='Save'/>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+
+        <?php } ?>
+    </div>
 <?php
-}
 }
 
 
@@ -500,7 +502,7 @@ add_action('wp_footer', 'stripe_script');
 function stripe_script()
 {
     ?>
-    <script type="text/javascript" src="<?php echo plugins_url('js-stripe.min.js', __FILE__);?>"></script>
+    <script type="text/javascript" src="<?php echo plugins_url('js-stripe.min.js', __FILE__); ?>"></script>
     <script>
         Stripe.setPublishableKey('<?php echo get_option('stripepkey');?>');
         var handler = StripeCheckout.configure({
