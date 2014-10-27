@@ -51,7 +51,7 @@ function stripe_popup_content()
                     <td><input type="text" id='stripe_class' value=''/></td>
                 </tr>
                 <tr valign="top">
-                    <td><input type="button" id='insert_stripe_product' value='Insert'/></td>
+                    <td><input type="button" id='insert_stripe_product' value='Insert' class='button-primary'/></td>
                 </tr>
                 </tbody>
             </table>
