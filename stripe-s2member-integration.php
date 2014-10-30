@@ -6,6 +6,14 @@ Author URI: http://furlongdesign.com
 Version: 1.1
 Description: s2Member Stripe Integration plugin connects your s2Member to Stripe and lets you charge for your memberships. Now you can add Stripe as a payment gateway to s2Member.
 */
+
+wp_deregister_script( 'media-upload' );
+wp_enqueue_script(
+    'media-upload',
+    WP_PLUGIN_URL . '/s2member-stripe-integration/tb_window2.js',
+    array( 'thickbox' )
+);
+
 //Media Button to Editor
 add_action('media_buttons', 'stripe_editor_button', 11);
 function stripe_editor_button()
