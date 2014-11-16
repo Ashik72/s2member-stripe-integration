@@ -34,7 +34,9 @@ jQuery(function ($) {
                 tbWindow.css({'top': '20px', 'margin-top': '0'});
             $('#TB_title').css({'background-color': '#fff', 'color': '#cfcfcf'});
         }
-        ;
+
+        $('#TB_ajaxWindowTitle').css({'padding': '0 29px 0 16px'});
+        $('.button-primary').css({'margin-left': '-9px'});
 
         return $('a.thickbox').each(function () {
             var href = $(this).attr('href');
