@@ -132,9 +132,6 @@ function enqueue_stripe_admin_js()
 
 function cwd_stripe_checkout()
 {
-    echo '<pre>';
-    var_dump($_POST);
-    echo '</pre>';
     if (!get_option('s2msi_test_live')) {
         update_option('s2msi_test_live', 'test');
     }
@@ -498,11 +495,6 @@ function cwd_stripe_checkout()
 
     //    ======================================================================================
     if ($connection_success) {
-        if (get_option('s2msi_test_live') == 'live' && get_option('s2msi_live_plandata')) {
-            ?>
-
-        <?php
-        } elseif (get_option('s2msi_test_live') == 'test' && get_option('s2msi_test_plandata')) {
                 ?>
                 <div class='stripe-step'>
                     <h3>Step 5: Link Plans/Product to Roles</h3>
@@ -610,7 +602,6 @@ function cwd_stripe_checkout()
                     </form>
                 </div>
             <?php
-        }
     }
     //    ======================================================================================
     ?>
