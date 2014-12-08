@@ -481,7 +481,7 @@ function cwd_stripe_checkout()
                             <!--                                to Stripe</a>-->
 
                             <form action="" method="post">
-                                <input type="submit" name="s2msi_setconnectstripe" value="Connect to Stripe"
+                                <input type="submit" name="setconnectstripe" value="Connect to Stripe"
                                        class="button-primary" id="set_connect_stripe"/>
                             </form>
                         </td>
