@@ -3,7 +3,7 @@ Contributors: Furlong Design
 Tags: Stripe
 Requires at least: 3.0.1
 Tested up to: 3.9.1
-Stable tag: 1.1
+Stable tag: 1.2
 
 == Description ==
 
@@ -43,3 +43,4 @@ The currency support is based on stripe. Under stripe -> account settings -> gen
 == Changelog ==
 
 1.1
+1.2
