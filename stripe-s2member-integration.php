@@ -579,7 +579,7 @@ function cwd_stripe_checkout()
                 </div>
 
                 <div class='stripe-step'>
-                    <h3>Step 4: Confirmation Page</h3>
+                    <h3>Step 6: Confirmation Page</h3>
 
                     <form action="" method='post'>
                         <table class="form-table widefat" style='width:850px;'>
