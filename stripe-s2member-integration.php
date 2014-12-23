@@ -3,7 +3,7 @@
 Plugin Name: s2Member Stripe Integration
 Author: Furlong Design
 Author URI: http://furlongdesign.com
-Version: 1.2
+Version: 1.3
 Description: s2Member Stripe Integration plugin connects your s2Member to Stripe and lets you charge for your memberships. Now you can add Stripe as a payment gateway to s2Member.
 */
 
@@ -1045,26 +1045,42 @@ function stripe_script()
 add_action('wp_footer', 'stripe_script2');
 function stripe_script2()
 {
-    $s2msi_plandata = '';
+//    $s2msi_plandata = '';
+    $s2msi_stripeskey = '';
+    $s2msi_stripepkey = '';
     if (get_option('s2msi_test_live') == 'live' && get_option('s2msi_test_plandata')) {
-        $s2msi_plandata = get_option('s2msi_plandata');
+//        $s2msi_plandata = get_option('s2msi_plandata');
+        if (strlen(get_option('s2msi_stripeskey')) > 1) {
+            $s2msi_stripeskey = get_option('s2msi_stripeskey');
+        }
+        if (strlen(get_option('s2msi_stripepkey')) > 1) {
+            $s2msi_stripepkey = get_option('s2msi_stripepkey');
+        }
     } elseif (get_option('s2msi_test_live') == 'test' && get_option('s2msi_test_plandata')) {
-        $s2msi_plandata = get_option('s2msi_test_plandata');
+//        $s2msi_plandata = get_option('s2msi_test_plandata');
+        if (strlen(get_option('s2msi_test_stripeskey')) > 1) {
+            $s2msi_stripeskey = get_option('s2msi_test_stripeskey');
+        }
+        if (strlen(get_option('s2msi_test_stripepkey')) > 1) {
+            $s2msi_stripepkey = get_option('s2msi_test_stripepkey');
+        }
     }
     ?>
     <script type="text/javascript" src="<?php echo plugins_url('js-stripe.min.js', __FILE__); ?>"></script>
     <script>
-        Stripe.setPublishableKey('<?php echo $s2msi_plandata;?>');
+        Stripe.setPublishableKey('<?php echo $s2msi_stripepkey;?>');
         var handler = StripeCheckout.configure({
-            key: '<?php echo $s2msi_plandata; ?>',
+            key: '<?php echo $s2msi_stripepkey; ?>',
             image: '<?php echo plugins_url('stripe_128.png', __FILE__);?>',
             token: function (response) {
                 // Use the token to create the charge with a server-side script.
                 // You can access the token ID with `token.id`
 
-
-                Stripe.getToken(response.id, function (status, r) {
-                    if (status == 200 && !r.used) {
+//                console.log(response)
+//                Stripe.getToken(response.id, function (status, r) {
+//                    console.log(status, r)
+//                    if (status == 200 && !r.used) {
+                    if (response.id) {
                         jQuery.ajax({
                             url: '<?php echo get_bloginfo('url') ?>/wp-admin/admin-ajax.php?action=create_s2user_with_stripe',
                             type: 'POST',
@@ -1076,7 +1092,7 @@ function stripe_script2()
                     } else {
                         alert('There is an issue with stripe, Please try again.');
                     }
-                });
+//                });
 
 
             }
@@ -1094,13 +1110,13 @@ add_action('wp_ajax_create_s2user_with_stripe', 'create_s2user_with_stripe');
 function create_s2user_with_stripe() //TODO
 {
     if ($_POST['stripeToken']) {
-        $stripeskey = (get_option('s2msi_test_live') == 'live') ? get_option('s2msi_stripepkey') : get_option('s2msi_test_stripepkey');
+        $stripeskey = (get_option('s2msi_test_live') == 'live') ? get_option('s2msi_stripeskey') : get_option('s2msi_test_stripeskey');
         require_once('stripe/lib/Stripe.php');
         Stripe2 :: setApiKey($stripeskey);
         $token = $_POST['stripeToken'];
         if (strlen($_POST['plan']) > 1) {
             $customer = Stripe_Customer2::create(
-                array("card" => $token, "plan" => $_POST['plan'], "email" => $_POST['email'])
+                array("card" => $token, "plan" => $_POST['plan'], "email" => $_POST['email']), $stripeskey
             );
             $level    = str_replace('s2member_level', '', $_POST['level']);
         } else {
