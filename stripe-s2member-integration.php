@@ -3,7 +3,7 @@
 Plugin Name: s2Member Stripe Integration
 Author: Furlong Design
 Author URI: http://furlongdesign.com
-Version: 1.3
+Version: 1.3.1
 Description: s2Member Stripe Integration plugin connects your s2Member to Stripe and lets you charge for your memberships. Now you can add Stripe as a payment gateway to s2Member.
 */
 
@@ -139,7 +139,6 @@ function cwd_stripe_checkout()
         update_option('s2msi_test_live', $_POST['s2msi_test_live']);
         update_option('s2msi_set_stripepkey', $_POST['pkey']);
         update_option('s2msi_set_stripeskey', $_POST['skey']);
-        update_option('s2msi_set_stripeamount', $_POST['samount']);
         update_option('s2msi_set_test_stripepkey', $_POST['test_pkey']);
         update_option('s2msi_set_test_stripeskey', $_POST['test_skey']);
     }
@@ -309,14 +308,6 @@ function cwd_stripe_checkout()
                     <td>
                         <input type="text" name="pkey" value="<?php echo get_option('s2msi_set_stripepkey'); ?>"
                                size="35">
-                    </td>
-                </tr>
-                <tr valign="top">
-                    <th scope="row">Amount:</th>
-                    <td>
-                        <input type="text" name="samount"
-                               value="<?php echo get_option('s2msi_set_stripeamount'); ?>"
-                               size="4">
                     </td>
                 </tr>
                 <tr valign="top">
@@ -522,6 +513,9 @@ function cwd_stripe_checkout()
                                 if (strpos(strtolower($k), 's2member') !== false) {
                                     $type = get_option('stripe_role_type_' . $k);
                                     echo "<tr class='stripe-row'><td>" . $role['name'] . "</td><td>";
+                                    if($type != 1 && $type != 2){
+                                        $type = 1;
+                                    }
                                     if ($type == 1) {
                                         echo "<div class='stripe" . $type . "'><input type='radio' name='stripe_role_check_" . $k . "' value='1' checked='checked' />";
                                     } else {
@@ -576,8 +570,10 @@ function cwd_stripe_checkout()
                     <form action="" method='post'>
                         <table class="form-table widefat" style='width:850px;'>
                             <tr class='stripe-row'>
-                                <td valign='top' colspan='2'>
-                                    <label>Select Page</label>
+                                <td>
+                                    Select Page
+                                </td>
+                                <td>
                                     <select name="thankyou_page">
                                         <option value="">Select Page</option>
                                         <?php
@@ -591,6 +587,7 @@ function cwd_stripe_checkout()
                                         }
                                         ?>
                                     </select>
+                                </td>
                             </tr>
                             <tr valign='top' class='stripe-row'>
                                 <th></th>
